@@ -1,4 +1,5 @@
 import hashlib
+import os
 
 
 # KEYS.BIN
