@@ -30,6 +30,12 @@ class Storage:
     def from_bytes(value: bytes) -> int:
         return int.from_bytes(value, byteorder='big')
 
+    def defragmentation(self) -> NoReturn:
+        from main.defrag import Defragmentation
+
+        d = Defragmentation(self.key_file, self.value_file)
+        d.defragmentation()
+
     def _find_key(self, finder: str) -> Union[bool, int]:
         with open(self.key_file, 'rb') as f:
             while True:

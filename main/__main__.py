@@ -38,6 +38,10 @@ if __name__ == '__main__':
     long_parser = subparsers.add_parser('long', help='сессия в консоли')
     long_parser.set_defaults(command="long")
 
+    defrag_parser = subparsers.add_parser('defrag', help='дефрагментации '
+                                                         'хранилища')
+    defrag_parser.set_defaults(command="defrag")
+
     del_parser = subparsers.add_parser('del', help='Удаление значения')
     del_parser.add_argument('key', help='Ключ', type=str)
     del_parser.set_defaults(command="del")
@@ -54,5 +58,7 @@ if __name__ == '__main__':
             storage.delete(args.key)
         elif command == 'long':
             long_session()
+        elif command == 'defrag':
+            storage.defragmentation()
     except KeyError:
         exit("Был введен неверный ключ")
