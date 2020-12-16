@@ -21,7 +21,6 @@ class Defragmentation:
             while True:
                 packet = f.read(72)
                 key, offset = packet[:64], self.from_bytes(packet[64:])
-
                 if key == b'' and offset == 0:
                     print('Скан закончен')
                     break
@@ -32,7 +31,7 @@ class Defragmentation:
                     value = a.read(length)
                     self.data[key] = value
 
-    def defragmentation(self) -> NoReturn:
+    def start(self) -> NoReturn:
         print('Начало дефрагментации')
         self.scan_file()
         key_path = Path(self.key_file)
@@ -58,4 +57,4 @@ class Defragmentation:
             with open(temp_key, 'ab') as f:
                 f.write(i)
                 f.write(self.to_bytes(pos, 8))
-        print('Дефрагментация успешно завершена')
+        print('Дефрагментация завершена')

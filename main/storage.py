@@ -34,7 +34,7 @@ class Storage:
         from main.defrag import Defragmentation
 
         d = Defragmentation(self.key_file, self.value_file)
-        d.defragmentation()
+        d.start()
 
     def _find_key(self, finder: str) -> Union[bool, int]:
         with open(self.key_file, 'rb') as f:
@@ -43,7 +43,7 @@ class Storage:
                 key, offset = packet[:64], self.from_bytes(packet[64:])
                 if key == self.get_hash(finder):
                     return offset
-                if key == b'' and offset == 0:
+                if key == b'':
                     return False
 
     def set_data(self, key: str, value: str) -> NoReturn:
@@ -87,7 +87,7 @@ class Storage:
                         value = a.read(length)
                         print(f'значение: {value.decode()}')
                         break
-                if key == b'' and offset == 0:
+                if key == b'':
                     print('Ключ не найден')
                     break
 
@@ -100,13 +100,14 @@ class Storage:
                 start = f.tell()
                 packet = f.read(72)
                 end = f.tell()
-                key, offset = packet[:64], self.from_bytes(packet[64:])
+                key = packet[:64]
                 if key == self.get_hash(find_key):
                     new_data = data[:start] + data[end:]
                     break
-                if key == b'' and offset == 0:
+                if key == b'':
                     print('ключ не найден')
                     break
+
         if new_data is not None:
             p = Path(self.key_file)
             p.unlink(True)
