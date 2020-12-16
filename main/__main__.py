@@ -4,6 +4,11 @@ from main.storage import Storage
 
 
 def long_session():
+    print('''Возможные команды:
+    set - Ввод данных в хранилище
+    get - Получение данных из хранилища
+    del - Удаление данных из хранилища
+    exit - Выход из программы\n''')
     print('Начало сессии')
     print('===================================')
     while True:
@@ -12,7 +17,7 @@ def long_session():
             storage.set_data(input('Введите ключ: '),
                              input('Введите значение: '))
         elif x == 'get':
-            storage.get(input('Ключ: '))
+            print(storage.get(input('Ключ: ')))
         elif x == 'del':
             storage.delete(input('Ключ: '))
         elif x == 'exit':
@@ -35,10 +40,10 @@ if __name__ == '__main__':
     get_parser.add_argument('key', help='Ключ', type=str)
     get_parser.set_defaults(command="get")
 
-    long_parser = subparsers.add_parser('long', help='сессия в консоли')
+    long_parser = subparsers.add_parser('long', help='Долгая сессия')
     long_parser.set_defaults(command="long")
 
-    defrag_parser = subparsers.add_parser('defrag', help='дефрагментации '
+    defrag_parser = subparsers.add_parser('defrag', help='Дефрагментации '
                                                          'хранилища')
     defrag_parser.set_defaults(command="defrag")
 

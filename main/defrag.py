@@ -40,11 +40,11 @@ class Defragmentation:
         val_path = Path(self.value_file)
         val_path.unlink(True)
 
-        temp_key = Path('keys.bin')
+        temp_key = Path(self.key_file)
         temp_key.touch()
         temp_key.rename(self.key_file)
 
-        temp_val = Path('values.bin')
+        temp_val = Path(self.value_file)
         temp_val.touch()
         temp_val.rename(self.value_file)
 

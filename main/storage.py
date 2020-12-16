@@ -85,11 +85,9 @@ class Storage:
                         a.seek(offset)
                         length = self.from_bytes(a.read(4))
                         value = a.read(length)
-                        print(f'значение: {value.decode()}')
-                        break
+                        return f'значение: {value.decode()}'
                 if key == b'':
-                    print('Ключ не найден')
-                    break
+                    return 'Ключ не найден'
 
     def delete(self, find_key: str) -> NoReturn:
         new_data = None
