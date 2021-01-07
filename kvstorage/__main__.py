@@ -1,6 +1,7 @@
 import argparse
 
-from main.storage import Storage
+from kvstorage.path_manager import PathManager
+from kvstorage.storage import Storage
 
 
 def long_session():
@@ -8,6 +9,11 @@ def long_session():
     set - Ввод данных в хранилище
     get - Получение данных из хранилища
     del - Удаление данных из хранилища
+    all - Получение всех значений из хранилища
+    chp - Смена хранилища
+    stp - Добавление хранилища
+    dlp - Удаление хранилища
+    defrag - Дефрагментации хранилища
     exit - Выход из программы\n''')
     print('Начало сессии')
     print('===================================')
@@ -20,6 +26,18 @@ def long_session():
             print(storage.get(input('Ключ: ')))
         elif x == 'del':
             storage.delete(input('Ключ: '))
+        elif x == 'all':
+            storage.get_all()
+        elif x == 'chp':
+            storage.select_storage()
+        elif x == 'stp':
+            path_manager.add_path(input('Название места: '),
+                                  input('Путь до ключа: '),
+                                  input('Путь до значения: '))
+        elif x == 'dlp':
+            path_manager.del_path(input('Название места: '))
+        elif x == 'defrag':
+            storage.defragmentation()
         elif x == 'exit':
             print('===================================')
             break
@@ -43,6 +61,10 @@ if __name__ == '__main__':
     long_parser = subparsers.add_parser('long', help='Долгая сессия')
     long_parser.set_defaults(command="long")
 
+    get_all_parser = subparsers.add_parser('all', help='получение '
+                                                       'все значений')
+    get_all_parser.set_defaults(command="all")
+
     defrag_parser = subparsers.add_parser('defrag', help='Дефрагментации '
                                                          'хранилища')
     defrag_parser.set_defaults(command="defrag")
@@ -53,6 +75,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     storage = Storage('keys.bin', 'values.bin')
+    path_manager = PathManager()
     command = args.command
     try:
         if command == 'set':
@@ -65,5 +88,7 @@ if __name__ == '__main__':
             long_session()
         elif command == 'defrag':
             storage.defragmentation()
+        elif command == 'all':
+            storage.get_all()
     except KeyError:
         exit("Был введен неверный ключ")

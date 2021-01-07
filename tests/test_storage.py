@@ -1,8 +1,8 @@
 from pathlib import Path
 from unittest import TestCase
 
-from main.defrag import Defragmentation
-from main.storage import Storage
+from kvstorage.defrag import Defragmentation
+from kvstorage.storage import Storage
 
 
 class TestStorage(TestCase):
@@ -20,12 +20,12 @@ class TestStorage(TestCase):
         self.storage.set_data('test', 'storage')
 
     def test_1_set_data_key(self):
-        with open(self.storage.key_file, 'rb') as f:
+        with open(self.storage.def_key_file, 'rb') as f:
             data = f.read(72)
         self.assertEqual(data, self.right_key)
 
     def test_2_set_data_value(self):
-        with open(self.storage.value_file, 'rb') as f:
+        with open(self.storage.def_value_file, 'rb') as f:
             data = f.read(4 + len('storage'))
         self.assertEqual(data, self.right_value)
 
@@ -35,21 +35,21 @@ class TestStorage(TestCase):
 
     def test_4_delete_key(self):
         self.storage.delete('test')
-        with open(self.storage.key_file, 'rb') as f:
+        with open(self.storage.def_key_file, 'rb') as f:
             data = f.read()
         self.assertEqual(data, b'')
 
     def test_5_delete_val(self):
-        with open(self.storage.value_file, 'rb') as f:
+        with open(self.storage.def_value_file, 'rb') as f:
             data = f.read()
         self.assertEqual(data, self.right_value)
 
     def test_6_defragmentation(self):
         d = Defragmentation(self.keys_bin, self.values_bin)
         d.start()
-        with open(self.storage.key_file, 'rb') as f:
+        with open(self.storage.def_key_file, 'rb') as f:
             data1 = f.read()
-        with open(self.storage.value_file, 'rb') as f:
+        with open(self.storage.def_value_file, 'rb') as f:
             data2 = f.read()
         if data1 == self.right_key and data2 == self.right_value:
             self.assertTrue(True)

@@ -1,6 +1,9 @@
 from pathlib import Path
 from typing import NoReturn
 
+from kvstorage.consts import KEY_BLOCK_LEN, \
+    KEY_LEN, VALUE_OFFSET_LEN, KEY_OFFSET_LEN
+
 
 class Defragmentation:
     def __init__(self, key_file: str, value_file: str):
@@ -16,24 +19,25 @@ class Defragmentation:
     def from_bytes(value: bytes) -> int:
         return int.from_bytes(value, byteorder='big')
 
-    def scan_file(self) -> NoReturn:
+    def prepare(self) -> NoReturn:
         with open(self.key_file, 'rb') as f:
             while True:
-                packet = f.read(72)
-                key, offset = packet[:64], self.from_bytes(packet[64:])
-                if key == b'' and offset == 0:
+                packet = f.read(KEY_BLOCK_LEN)
+                key = packet[:KEY_LEN]
+                offset = self.from_bytes(packet[KEY_LEN:])
+                if key == b'':
                     print('Скан закончен')
                     break
 
                 with open(self.value_file, 'rb') as a:
                     a.seek(offset)
-                    length = self.from_bytes(a.read(4))
+                    length = self.from_bytes(a.read(VALUE_OFFSET_LEN))
                     value = a.read(length)
                     self.data[key] = value
 
     def start(self) -> NoReturn:
         print('Начало дефрагментации')
-        self.scan_file()
+        self.prepare()
         key_path = Path(self.key_file)
         key_path.unlink(True)
 
@@ -51,10 +55,10 @@ class Defragmentation:
         for i in self.data:
             with open(temp_val, 'ab') as f:
                 pos = f.tell()
-                f.write(self.to_bytes(len(self.data[i]), 4))
+                f.write(self.to_bytes(len(self.data[i]), VALUE_OFFSET_LEN))
                 f.write(self.data[i])
 
             with open(temp_key, 'ab') as f:
                 f.write(i)
-                f.write(self.to_bytes(pos, 8))
+                f.write(self.to_bytes(pos, KEY_OFFSET_LEN))
         print('Дефрагментация завершена')
