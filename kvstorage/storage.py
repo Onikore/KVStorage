@@ -105,8 +105,6 @@ class Storage:
                     f.seek(start)
                     f.write(temp)
                     f.truncate(end)
-
-                    # del self.keys[key]
                     break
 
     def get_all(self):
