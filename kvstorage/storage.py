@@ -1,5 +1,4 @@
 import hashlib
-from pathlib import Path
 from typing import NoReturn, Dict
 
 from kvstorage import errors
@@ -9,11 +8,8 @@ from kvstorage.path_manager import PathManager
 
 
 class Storage:
-    def __init__(self, key_file: str, value_file: str):
+    def __init__(self):
         self.pm = PathManager()
-
-        self.new_key_file = Path(key_file)
-        self.new_value_file = Path(value_file)
 
         self.def_key_file = self.pm.default_key_path
         self.def_value_file = self.pm.default_value_path
@@ -23,6 +19,7 @@ class Storage:
     def prepare(self) -> NoReturn:
         self.pm.prepare()
         self.pm.set_defaults()
+        self.load()
 
     def load(self) -> NoReturn:
         with self.def_key_file.open('rb') as f:
@@ -32,7 +29,6 @@ class Storage:
                 offset = self.from_bytes(packet[KEY_LEN:])
                 if key == b'':
                     break
-
                 self.keys[key] = offset
 
     def defragmentation(self) -> NoReturn:
@@ -55,8 +51,8 @@ class Storage:
 
                 self.keys[hashed_key] = pos
         else:
-            self.delete(key)
             self.set_if_exists(key, value)
+            self.delete(key)
 
     def set_if_exists(self, key: str, value: str):
         hashed_key = self.get_hash(key)
@@ -79,7 +75,7 @@ class Storage:
 
         self.keys[hashed_key] = pos
 
-    def get(self, find_key: str) -> NoReturn:
+    def get(self, find_key: str) -> str:
         find_key = self.get_hash(find_key)
         if find_key in self.keys:
             with open(self.def_value_file, 'rb') as f:
@@ -94,7 +90,6 @@ class Storage:
                 start = f.tell()
                 packet = f.read(KEY_BLOCK_LEN)
                 key = packet[:KEY_LEN]
-
                 if key == b'':
                     raise errors.KeyNotFoundError
 
@@ -105,22 +100,19 @@ class Storage:
                     f.seek(start)
                     f.write(temp)
                     f.truncate(end)
+                    self.keys.pop(key, None)
                     break
 
-    def get_all(self):
-        cases = []
+    def get_all(self) -> NoReturn:
         with self.def_value_file.open('rb') as f:
             while True:
                 offset = f.read(VALUE_OFFSET_LEN)
-
                 if offset == b'':
-                    [print(x, end=' ') for x in cases]
                     break
-
                 key = f.read(self.from_bytes(offset))
-                cases.append(key.decode())
+                print(key.decode())
 
-    def select_storage(self):
+    def select_storage(self) -> NoReturn:
         res = self.pm.select_path()
         self.def_key_file = res[0]
         self.def_value_file = res[1]

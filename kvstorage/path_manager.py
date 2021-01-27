@@ -19,6 +19,9 @@ class PathManager:
         if not self.path_config.exists():
             self.path_config.touch()
 
+        if not self.path_config.stat().st_size:
+            self.set_defaults()
+
     def add_path(self, place: str, key_path: str, value_path: str) -> NoReturn:
         data: Dict[str, Dict[str, str]] = {
             place: {
@@ -26,9 +29,6 @@ class PathManager:
                 'value': value_path
             }
         }
-
-        if not self.path_config.stat().st_size:
-            self.set_defaults()
 
         with open(self.path_config, 'r') as f:
             temp = json.load(f)
@@ -39,7 +39,7 @@ class PathManager:
     def del_path(self, place: str) -> NoReturn:
         with open(self.path_config, 'r') as f:
             temp = json.load(f)
-        del temp[place]
+        temp.pop(place, None)
         with open(self.path_config, 'w') as f:
             json.dump(temp, f)
 
@@ -53,7 +53,7 @@ class PathManager:
         with open(self.path_config, 'w') as f:
             json.dump(data, f)
 
-    def select_path(self) -> NoReturn:
+    def select_path(self) -> tuple:
         mas = []
         with open(self.path_config, 'r') as f:
             temp = json.load(f)
@@ -61,12 +61,11 @@ class PathManager:
         for i, v in enumerate(temp):
             print(f'{i}: {v}')
             mas.append(v)
-        value = int(input("Выберите место хранения файлов: "))
-        mas_len = len(mas) - 1
 
-        if value > mas_len:
-            raise errors.ListLengthError(mas_len)
-        if value < 0:
-            raise errors.NegativeLengthError(mas_len)
-
-        return temp[mas[value]]['key'], temp[mas[value]]['value']
+        try:
+            value = int(input("Выберите место хранения файлов: "))
+            return temp[mas[value]]['key'], temp[mas[value]]['value']
+        except IndexError:
+            raise errors.ListLengthError(len(mas))
+        except ValueError:
+            raise errors.InvalidValueError

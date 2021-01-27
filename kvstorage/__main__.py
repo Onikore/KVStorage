@@ -74,21 +74,19 @@ if __name__ == '__main__':
     del_parser.set_defaults(command="del")
     args = parser.parse_args()
 
-    storage = Storage('keys.bin', 'values.bin')
+    storage = Storage()
+    storage.prepare()
     path_manager = PathManager()
     command = args.command
-    try:
-        if command == 'set':
-            storage.set_data(args.key, args.value)
-        elif command == 'get':
-            storage.get(args.key)
-        elif command == 'del':
-            storage.delete(args.key)
-        elif command == 'long':
-            long_session()
-        elif command == 'defrag':
-            storage.defragmentation()
-        elif command == 'all':
-            storage.get_all()
-    except KeyError:
-        exit("Был введен неверный ключ")
+    if command == 'set':
+        storage.set_data(args.key, args.value)
+    elif command == 'get':
+        storage.get(args.key)
+    elif command == 'del':
+        storage.delete(args.key)
+    elif command == 'long':
+        long_session()
+    elif command == 'defrag':
+        storage.defragmentation()
+    elif command == 'all':
+        storage.get_all()

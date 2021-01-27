@@ -1,5 +1,5 @@
 class APIError(Exception):
-    message: str
+    pass
 
 
 class KeyNotFoundError(APIError):
@@ -12,12 +12,9 @@ class ListLengthError(APIError):
         self.length = length
 
     def __str__(self):
-        return f'(0-{self.length - 1})'
+        return f'Available places are (0-{self.length - 1})'
 
 
-class NegativeLengthError(APIError):
-    def __init__(self, length):
-        self.length = length
-
+class InvalidValueError(APIError):
     def __str__(self):
-        return 'length must be greater than 0'
+        return 'Number must be positive integer'
