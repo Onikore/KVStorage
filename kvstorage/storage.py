@@ -8,8 +8,14 @@ from kvstorage.path_manager import PathManager
 
 
 class Storage:
-    def __init__(self):
+    def __init__(self, key=None, val=None, path=None):
         self.pm = PathManager()
+        if key is not None and\
+                val is not None and\
+                path is not None:
+            self.pm.default_key_path = key
+            self.pm.default_value_path = val
+            self.pm.path_config = path
 
         self.def_key_file = self.pm.default_key_path
         self.def_value_file = self.pm.default_value_path
